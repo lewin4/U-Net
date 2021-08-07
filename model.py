@@ -54,13 +54,13 @@ class Decoder(nn.Module):
 class UNet(nn.Module):
     def __init__(self, enc_chs=(3, 64, 128, 256, 512, 1024),
                  dec_chs=(1024, 512, 256, 128, 64),
-                 num_class=1,
+                 num_class=3,
                  retain_dim=False,
                  out_size=(572, 572)):
         super().__init__()
         self.encoder = Encoder(enc_chs)
         self.decoder = Decoder(dec_chs)
-        self.head = nn.Conv2d(dec_chs[-1], num_class, 1)
+        self.head = nn.Conv2d(dec_chs[-1], num_class, (1, 1))
         self.retain_dim = retain_dim
         self.out_size = out_size
 
@@ -71,3 +71,9 @@ class UNet(nn.Module):
         if self.retain_dim:
             out = F.interpolate(out, self.out_size)
         return out
+
+
+# model = UNet()
+# x = torch.randn((1,3,572,200))
+# y = model(x)
+# print(y.shape)
