@@ -79,99 +79,27 @@ def main():
     )
 
     train_dataset = SewageDataset(IMG_DIR, MASK_DIR, transform=train_transform)
-    img, label = train_dataset[195]
-    print(len(train_dataset))
-    print(type(img),img.shape)
-    print(type(label), label.shape)
-    unloader = transforms.ToPILImage()
-
-    def imshow(tensor, title=None):
-        image = tensor.cpu().clone()  # we clone the tensor to not do changes on it
-        image = image.squeeze(0)  # remove the fake batch dimension
-        image = unloader(image)
-        plt.imshow(image)
-        if title is not None:
-            plt.title(title)
-        plt.pause(0.001)  # pause a bit so that plots are updated
-
-    def channels(tensor,):
-        channel = {"0":0, "1":0, "2":0}
-        shape = tensor.shape
-        print(shape)
-        for i in range(shape[0]):
-            for j in range(shape[1]):
-                if tensor[i][j].item() == 0:
-                    channel["0"]+=1
-                elif tensor[i][j].item() == 1:
-                    channel["1"]+=1
-                else:
-                    channel["2"] += 1
-        return channel
-
-    def channelss(tensor,):
-        channel = []
-        shape = tensor.shape
-        print(shape)
-        for i in range(shape[0]):
-            for j in range(shape[1]):
-                if not tensor[i][j] in channel:
-                    channel.append(tensor[i][j])
-                    print(i,j,tensor[i][j])
-
-        return channel
-
-    def tensor_to_np(tensor):
-        img = tensor.mul(255).byte()
-        img = img.cpu().numpy().transpose((1, 2, 0))
-        print(img.shape)
-        return img
-
-    def show_from_cv(img, title=None):
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        plt.figure()
-        plt.imshow(img)
-        if title is not None:
-            plt.title(title)
-        plt.pause(0.001)
-
-    def tensor_to_nplabel(tensor):
-        img = tensor.mul(255).byte()
-        img = img.cpu().numpy()
-        print(img.shape)
-        return img
 
 
 
 
+    model = UNet().to(device=DEVICE)
+    loss_fn = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
+    train_loader, val_loader = get_loaders(
+        IMG_DIR,
+        MASK_DIR,
+        BATCH_SIZE,
+        NUM_WORKER,
+        PIN_MEMORY,
+        train_transform,
+        val_transforms,
+    )
 
-    # print(channels(label))
-    # print(channelss(label))
-    # imshow(img)
-    # imshow(label)
-    show_from_cv(tensor_to_np(img), "numpy_img")
-    show_from_cv(tensor_to_nplabel(label), "numpy_label")
-
-
-
-
-    # model = UNet().to(device=DEVICE)
-    # loss_fn = nn.CrossEntropyLoss()
-    # optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
-    #
-    # train_loader, val_loader = get_loaders(
-    #     IMG_DIR,
-    #     MASK_DIR,
-    #     BATCH_SIZE,
-    #     NUM_WORKER,
-    #     PIN_MEMORY,
-    #     train_transform,
-    #     val_transforms,
-    # )
-    #
-    # scaler = torch.cuda.amp.GradScaler()
-    # for epoch in range(NUM_EPOCHS):
-    #     train_fn(train_loader, model, optimizer, loss_fn, scaler)
+    scaler = torch.cuda.amp.GradScaler()
+    for epoch in range(NUM_EPOCHS):
+        train_fn(train_loader, model, optimizer, loss_fn, scaler)
 
     # save model
     # check accuracy
