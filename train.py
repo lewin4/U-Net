@@ -6,10 +6,8 @@ import torch.nn as nn
 import torch.optim as optim
 from model import UNet
 from dataloader import SewageDataset
-from PIL import Image
-import matplotlib.pyplot as plt
+from dataloader import get_loaders
 import torchvision.transforms as transforms
-import cv2
 
 
 # from utils import (load_checkpoint, save_checkout, get_loaders, check_accuracy, save_predictions_as_imgs,)
@@ -65,8 +63,7 @@ def main():
             ToTensorV2(),
         ],
     )
-
-    val_transforms = A.Compose(
+    val_transform = A.Compose(
         [
             A.Resize(height=IMAGE_HEIGHT, width=IMAGE_WIDTH),
             A.Normalize(
@@ -78,7 +75,7 @@ def main():
         ],
     )
 
-    train_dataset = SewageDataset(IMG_DIR, MASK_DIR, transform=train_transform)
+
 
 
 
@@ -94,7 +91,7 @@ def main():
         NUM_WORKER,
         PIN_MEMORY,
         train_transform,
-        val_transforms,
+        val_transform,
     )
 
     scaler = torch.cuda.amp.GradScaler()
