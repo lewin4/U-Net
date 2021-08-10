@@ -54,7 +54,7 @@ class Decoder(nn.Module):
 class UNet(nn.Module):
     def __init__(self, enc_chs=(3, 64, 128, 256, 512, 1024),
                  dec_chs=(1024, 512, 256, 128, 64),
-                 num_class=3,
+                 num_class=1,
                  retain_dim=False,
                  out_size=(572, 572)):
         super().__init__()
@@ -64,7 +64,7 @@ class UNet(nn.Module):
         self.retain_dim = retain_dim
         self.out_size = out_size
 
-    def forward(self, x, ):
+    def forward(self, x):
         enc_ftrs = self.encoder(x)
         out = self.decoder(enc_ftrs[::-1][0], enc_ftrs[::-1][1:])
         out = self.head(out)

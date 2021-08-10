@@ -9,7 +9,6 @@ from dataloader import SewageDataset
 from dataloader import get_loaders
 import torchvision.transforms as transforms
 
-
 # from utils import (load_checkpoint, save_checkout, get_loaders, check_accuracy, save_predictions_as_imgs,)
 
 # Hyperparameters etc.
@@ -27,7 +26,8 @@ MASK_DIR = r"D:\Code\data\sewage\small_dataset\small_single_label"
 
 
 def train_fn(loader, model, optimizer, loss_fn, scaler):
-    for batch_id, (data, targets) in tqdm(loader):
+    loop = tqdm(loader)
+    for batch_id, (data, targets) in loop:
         data = data.to(device=DEVICE)
         targets = targets.float().unsqueeze(1).to(deviec=DEVICE)
 
@@ -43,9 +43,7 @@ def train_fn(loader, model, optimizer, loss_fn, scaler):
         scaler.update()
 
         # update tqdm loop
-        tqdm(loader).set_postfix(loss=loss.item())
-
-
+        loop.set_postfix(loss=loss.item())
 
 
 def main():
@@ -75,13 +73,9 @@ def main():
         ],
     )
 
-
-
-
-
-
     model = UNet().to(device=DEVICE)
-    loss_fn = nn.CrossEntropyLoss()
+    # loss_fn = nn.CrossEntropyLoss()
+    loss_fn = nn.BCEWithLogitsLoss()
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
     train_loader, val_loader = get_loaders(
@@ -94,9 +88,9 @@ def main():
         val_transform,
     )
 
-    scaler = torch.cuda.amp.GradScaler()
+    scalar = torch.cuda.amp.GradScaler()
     for epoch in range(NUM_EPOCHS):
-        train_fn(train_loader, model, optimizer, loss_fn, scaler)
+        train_fn(train_loader, model, optimizer, loss_fn, scalar)
 
     # save model
     # check accuracy
