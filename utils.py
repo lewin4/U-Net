@@ -61,6 +61,7 @@ def save_predictions_as_imgs(
         )
         torchvision.utils.save_image(y.unsqueeze(1), f"{folder}{idx}.png")
 
+
     model.train()
 # if __name__ == "__main__":
 #     x = torch.tensor([0,0,0,0,1,1,1,1,1,1])
