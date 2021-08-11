@@ -52,11 +52,13 @@ class Decoder(nn.Module):
 
 
 class UNet(nn.Module):
-    def __init__(self, enc_chs=(3, 64, 128, 256, 512, 1024),
+    def __init__(self,
+                 enc_chs=(3, 64, 128, 256, 512, 1024),
                  dec_chs=(1024, 512, 256, 128, 64),
                  num_class=1,
                  retain_dim=False,
-                 out_size=(572, 572)):
+                 out_size=(572, 572),
+                 ):
         super().__init__()
         self.encoder = Encoder(enc_chs)
         self.decoder = Decoder(dec_chs)
@@ -74,6 +76,6 @@ class UNet(nn.Module):
 
 
 # model = UNet()
-# x = torch.randn((1,3,572,200))
+# x = torch.randn((3,3,572,200))
 # y = model(x)
 # print(y.shape)

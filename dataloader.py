@@ -19,6 +19,7 @@ class SewageDataset(Dataset):
             self.images = self.images[:int(0.7 * self.len)]
         else:
             self.images = self.images[int(0.7 * self.len):]
+        self.len = len(self.images)
 
     def __len__(self):
         return self.len
@@ -48,6 +49,7 @@ def get_loaders(image_dir,
                 val_transform):
     train_dataset = SewageDataset(image_dir, mask_dir, train=True, transform=train_transform)
     val_dataset = SewageDataset(image_dir, mask_dir, train=False, transform=val_transform)
+
 
     train_loader = DataLoader(train_dataset,
                               batch_size,
