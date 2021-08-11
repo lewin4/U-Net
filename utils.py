@@ -6,7 +6,7 @@ import logging
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(levelname)s %(message)s")
 
 
-def save_checkpoint(state, filename):
+def save_checkpoint(state, filename = "output/checkpoints/checkpoint.pth"):
     logging.info("Saving checkpoint")
     torch.save(state, filename)
 
@@ -41,7 +41,7 @@ def check_accuracy(loader, model, device):
 
 
 def save_predictions_as_imgs(
-    loader, model, folder="saved_images/", device="cuda"
+    loader, model, folder="output/saved_images/", device="cuda"
 ):
     model.eval()
     for idx, (x, y) in enumerate(loader):

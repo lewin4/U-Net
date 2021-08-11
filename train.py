@@ -9,7 +9,7 @@ from dataloader import SewageDataset
 from dataloader import get_loaders
 import torchvision.transforms as transforms
 
-# from utils import (load_checkpoint, save_checkout, get_loaders, check_accuracy, save_predictions_as_imgs,)
+from utils import (load_checkpoint, save_checkpoint, check_accuracy, save_predictions_as_imgs,)
 
 # Hyperparameters etc.
 LEARNING_RATE = 1e-4
@@ -93,8 +93,17 @@ def main():
         train_fn(train_loader, model, optimizer, loss_fn, scalar)
 
     # save model
+    checkpoint = {
+        "checkpoint":model.state_dict(),
+        "optimizer":optimizer.state_dict()
+    }
+    save_checkpoint(checkpoint)
+
     # check accuracy
+    check_accuracy(val_loader, model, DEVICE)
+
     # print some samples to folder
+    save_predictions_as_imgs(val_loader, model, device=DEVICE)
 
 
 if __name__ == "__main__":
