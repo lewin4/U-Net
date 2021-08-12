@@ -7,9 +7,9 @@ import torch.nn.functional as F
 class Block(nn.Module):
     def __init__(self, in_ch, out_ch):
         super().__init__()
-        self.conv1 = nn.Conv2d(in_ch, out_ch, (3, 3))
+        self.conv1 = nn.Conv2d(in_ch, out_ch, (3, 3), padding=(1, 1))
         self.relu = nn.ReLU()
-        self.conv2 = nn.Conv2d(out_ch, out_ch, (3, 3))
+        self.conv2 = nn.Conv2d(out_ch, out_ch, (3, 3), padding=(1, 1))
 
     def forward(self, x):
         return self.relu(self.conv2(self.relu(self.conv1(x))))
@@ -75,7 +75,7 @@ class UNet(nn.Module):
         return out
 
 
-# model = UNet()
-# x = torch.randn((3,3,572,200))
-# y = model(x)
-# print(y.shape)
+model = UNet(retain_dim=True)
+x = torch.randn((3,3,572,572))
+y = model(x)
+print(y.shape)
