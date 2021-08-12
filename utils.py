@@ -1,10 +1,30 @@
 import torchvision
 import torch
 from tqdm import tqdm
-
+import torch.nn as nn
 import logging
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+
+
+# Dice损失函数
+class DiceLoss(nn.Module):
+    def __init__(self):
+        super(DiceLoss, self).__init__()
+        self.epsilon = 1e-5
+
+    def forward(self, predict, target):
+        assert predict.size() == target.size(), "the size of predict and target must be equal."
+        num = predict.size(0)
+
+        pre = torch.sigmoid(predict).view(num, -1)
+        tar = target.view(num, -1)
+
+        intersection = (pre * tar).sum(-1).sum()  # 利用预测值与标签相乘当作交集
+        union = (pre + tar).sum(-1).sum()
+
+        score = 1 - 2 * (intersection + self.epsilon) / (union + self.epsilon)
+        return score
 
 
 def save_checkpoint(model, optimizer, filename):
@@ -21,7 +41,7 @@ def load_checkpoint(checkpoint, model):
     model.load_state_dict(checkpoint["checkpoint"])
 
 
-def check_accuracy(loader, model, device, epoch = 0):
+def check_accuracy(loader, model, device, epoch=0):
     num_correct = 0
     num_pixels = 0
     dice_score = 0

@@ -7,7 +7,7 @@ import torch.optim as optim
 from model import UNet
 from dataloader import get_loaders
 
-from utils import (load_checkpoint, save_checkpoint, check_accuracy, save_predictions_as_imgs, )
+from utils import (load_checkpoint, save_checkpoint, check_accuracy, save_predictions_as_imgs, DiceLoss)
 
 # Hyperparameters etc.
 LEARNING_RATE = 1e-4
@@ -83,7 +83,8 @@ def main():
 
     model = UNet(retain_dim=True, out_size=(IMAGE_HEIGHT, IMAGE_WIDTH)).to(DEVICE)
     # loss_fn = nn.CrossEntropyLoss()
-    loss_fn = nn.BCEWithLogitsLoss()
+    # loss_fn = nn.BCEWithLogitsLoss()
+    loss_fn = DiceLoss()
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
     train_loader, val_loader = get_loaders(
