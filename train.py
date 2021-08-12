@@ -12,8 +12,8 @@ from utils import (load_checkpoint, save_checkpoint, check_accuracy, save_predic
 # Hyperparameters etc.
 LEARNING_RATE = 1e-4
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-BATCH_SIZE = 4
-NUM_EPOCHS = 3
+BATCH_SIZE = 6
+NUM_EPOCHS = 30
 NUM_WORKER = 8
 IMAGE_WIDTH = 1024
 IMAGE_HEIGHT = 768
@@ -30,25 +30,25 @@ def train_fn(loader, model, optimizer, loss_fn, epoch, scaler):
         data = data.to(DEVICE)
         targets = targets.float().unsqueeze(1).to(DEVICE)
 
-        # # forward
-        # with torch.cuda.amp.autocast():
-        #     predictions = model(data)
-        #     loss = loss_fn(predictions, targets)
-        #
-        # # backward
-        # optimizer.zero_grad()
-        # scaler.scale(loss).backward()
-        # scaler.step(optimizer)
-        # scaler.update()
-
         # forward
-        predictions = model(data)
-        loss = loss_fn(predictions, targets)
+        with torch.cuda.amp.autocast():
+            predictions = model(data)
+            loss = loss_fn(predictions, targets)
 
         # backward
         optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+        scaler.scale(loss).backward()
+        scaler.step(optimizer)
+        scaler.update()
+
+        # # forward
+        # predictions = model(data)
+        # loss = loss_fn(predictions, targets)
+        #
+        # # backward
+        # optimizer.zero_grad()
+        # loss.backward()
+        # optimizer.step()
 
         # update tqdm loop
         loop.set_postfix(loss=loss.item())
