@@ -30,6 +30,7 @@ class SewageDataset(Dataset):
         image = np.array(Image.open(img_path))
         mask = np.array(Image.open(mask_path), dtype=np.float32)
 
+
         if self.transform is not None:
             augmentations = self.transform(image=image, mask=mask)
             image = augmentations["image"]
