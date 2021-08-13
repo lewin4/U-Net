@@ -27,8 +27,9 @@ class SewageDataset(Dataset):
     def __getitem__(self, item):
         img_path = os.path.join(self.image_dir, self.images[item])
         mask_path = os.path.join(self.mask_dir, self.images[item])
-        image = np.array(Image.open(img_path))
-        mask = np.array(Image.open(mask_path), dtype=np.float32)
+        image = np.array(Image.open(img_path).resize(768,1024))
+        mask = np.array(Image.open(mask_path).resize(768,1024), dtype=np.float32)
+
 
         if self.transform is not None:
             augmentations = self.transform(image=image, mask=mask)
