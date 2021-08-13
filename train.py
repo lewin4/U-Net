@@ -6,6 +6,8 @@ import torch.nn as nn
 import torch.optim as optim
 from model import UNet
 from dataloader import get_loaders
+import logging
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
 from utils import (load_checkpoint, save_checkpoint, check_accuracy, save_predictions_as_imgs, DiceLoss)
 
@@ -13,7 +15,7 @@ from utils import (load_checkpoint, save_checkpoint, check_accuracy, save_predic
 LEARNING_RATE = 5e-5
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 BATCH_SIZE = 4
-NUM_EPOCHS = 30
+NUM_EPOCHS = 20
 NUM_WORKER = 8
 IMAGE_WIDTH = 1024
 IMAGE_HEIGHT = 768
@@ -26,32 +28,35 @@ MASK_DIR = r"E:\LY\data\sewage\small_dataset\small_label"
 def train_fn(loader, model, optimizer, loss_fn, epoch, scaler):
     loop = tqdm(loader)
     loop.set_description(f"Epoch {epoch} train")
+    losses = []
     for data, targets in loop:
         data = data.to(DEVICE)
         targets = targets.float().unsqueeze(1).to(DEVICE)
 
-        # # forward
-        # with torch.cuda.amp.autocast():
-        #     predictions = model(data)
-        #     loss = loss_fn(predictions, targets)
-        #
-        # # backward
-        # optimizer.zero_grad()
-        # scaler.scale(loss).backward()
-        # scaler.step(optimizer)
-        # scaler.update()
-
         # forward
-        predictions = model(data)
-        loss = loss_fn(predictions, targets)
+        with torch.cuda.amp.autocast():
+            predictions = model(data)
+            loss = loss_fn(predictions, targets)
+            losses.append(loss)
 
         # backward
         optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+        scaler.scale(loss).backward()
+        scaler.step(optimizer)
+        scaler.update()
+
+        # # forward
+        # predictions = model(data)
+        # loss = loss_fn(predictions, targets)
+        #
+        # # backward
+        # optimizer.zero_grad()
+        # loss.backward()
+        # optimizer.step()
 
         # update tqdm loop
         loop.set_postfix(loss=loss.item())
+    logging.info(f"Epoch{epoch} mean loss: {sum(losses)/len(losses)}")
 
 
 def main():
@@ -102,14 +107,20 @@ def main():
         check_accuracy(val_loader, model, device=DEVICE)
 
     scalar = torch.cuda.amp.GradScaler()
+    best_score = 0
     for epoch in range(NUM_EPOCHS):
         train_fn(train_loader, model, optimizer, loss_fn, epoch, scalar)
 
         # check accuracy
-        check_accuracy(val_loader, model, device=DEVICE, epoch=epoch)
+        score = check_accuracy(val_loader, model, device=DEVICE, epoch=epoch)
+        if score>=best_score:
+            save_checkpoint(model, optimizer, filename=f"output/checkpoints/best_checkpoint.pth")
+            best_score = score
 
     # save model
     save_checkpoint(model, optimizer, filename="output/checkpoints/checkpoint.pth")
+    logging.info("Train done! The best model has been saved.")
+    logging.info(f"The best score is {best_score}.")
 
     # check accuracy
     check_accuracy(val_loader, model, device=DEVICE)
