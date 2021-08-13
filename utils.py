@@ -117,9 +117,9 @@ def load_checkpoint(checkpoint, model):
 
 
 def check_accuracy(loader, model, device, epoch=0):
-    num_correct = 0
-    num_pixels = 0
-    dice_score = 0
+    # num_correct = 0
+    # num_pixels = 0
+    # dice_score = 0
     model.eval()
 
     with torch.no_grad():
@@ -143,17 +143,15 @@ def check_accuracy(loader, model, device, epoch=0):
             # dice_score += (2 * (preds * y).sum()) / (
             #         (preds + y).sum() + 1e-8)
 
-    logging.info(
-        f"Got {num_correct}/{num_pixels} with acc {num_correct / num_pixels * 100:.2f}"
-    )
-    logging.info(f"Dice score: {dice_score / len(loader)}")
-    logging.info(
-        f"Got acc: {pa / len(loader) * 100:.2f}\n",
-        f"IOU-0: {(iou / len(loader))[0]}, IOU-1: {(iou / len(loader))[1]}",
-        f"mIOU: {np.mean(iou / len(loader))}"
-    )
+    # logging.info(
+    #     f"Got {num_correct}/{num_pixels} with acc {num_correct / num_pixels * 100:.2f}"
+    # )
+    # logging.info(f"Dice score: {dice_score / len(loader)}")
+    logging.info(f"Got acc: {pa / len(loader) * 100:.2f}")
+    logging.info(f"IOU-0: {(iou / len(loader)).item(0)}, IOU-1: {(iou / len(loader)).item(1)}")
+    logging.info(f"mIOU: {np.mean(iou / len(loader)).item()}")
     model.train()
-    return dice_score/len(loader)
+    return np.mean(iou / len(loader)).item()
 
 
 def save_predictions_as_imgs(loader, model, folder="output/saved_images/", device="cuda"):

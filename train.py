@@ -20,7 +20,7 @@ NUM_WORKER = 8
 IMAGE_WIDTH = 1024
 IMAGE_HEIGHT = 768
 PIN_MEMORY = True
-LOAD_MODEL = False
+LOAD_MODEL = True
 IMG_DIR = r"E:\LY\data\sewage\small_dataset\small_img"
 MASK_DIR = r"E:\LY\data\sewage\small_dataset\small_label"
 
@@ -102,18 +102,18 @@ def main():
         val_transform,
     )
 
+    best_score = 0
     if LOAD_MODEL:
-        load_checkpoint(torch.load("output/checkpoints/checkpoint.pth"), model)
-        check_accuracy(val_loader, model, device=DEVICE)
+        load_checkpoint(torch.load("output/checkpoints/best_checkpoint.pth"), model)
+        best_score = check_accuracy(val_loader, model, device=DEVICE)
 
     scalar = torch.cuda.amp.GradScaler()
-    best_score = 0
     for epoch in range(NUM_EPOCHS):
         train_fn(train_loader, model, optimizer, loss_fn, epoch, scalar)
 
         # check accuracy
         score = check_accuracy(val_loader, model, device=DEVICE, epoch=epoch)
-        if score>=best_score:
+        if score > best_score:
             save_checkpoint(model, optimizer, filename=f"output/checkpoints/best_checkpoint.pth")
             best_score = score
 
