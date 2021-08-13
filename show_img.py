@@ -6,8 +6,8 @@ from dataloader import SewageDataset
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
 
-IMG_DIR = r"D:\Code\data\sewage\small_dataset\small_img"
-MASK_DIR = r"D:\Code\data\sewage\small_dataset\small_label"
+IMG_DIR = r"E:\code\LY\data\sewage\small_dataset\small_img"
+MASK_DIR = r"E:\code\LY\data\sewage\small_dataset\small_label"
 IMAGE_WIDTH = 1024
 IMAGE_HEIGHT = 768
 
