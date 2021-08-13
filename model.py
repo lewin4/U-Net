@@ -75,7 +75,7 @@ class UNet(nn.Module):
         return out
 
 
-model = UNet(retain_dim=True)
-x = torch.randn((3,3,572,572))
-y = model(x)
-print(y.shape)
+# model = UNet(retain_dim=True)
+# x = torch.randn((3,3,572,572))
+# y = model(x)
+# print(y.shape)
