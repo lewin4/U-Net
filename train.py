@@ -14,7 +14,7 @@ from utils import (load_checkpoint, save_checkpoint, check_accuracy, save_predic
 # Hyperparameters etc.
 LEARNING_RATE = 5e-5
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-BATCH_SIZE = 4
+BATCH_SIZE = 6
 NUM_EPOCHS = 20
 NUM_WORKER = 8
 IMAGE_WIDTH = 1024
