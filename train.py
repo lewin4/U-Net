@@ -21,8 +21,8 @@ IMAGE_WIDTH = 1024
 IMAGE_HEIGHT = 768
 PIN_MEMORY = True
 LOAD_MODEL = False
-IMG_DIR = r"E:\LY\data\sewage\small_dataset\small_img"
-MASK_DIR = r"E:\LY\data\sewage\small_dataset\small_label"
+IMG_DIR = r"E:\code\LY\data\sewage\small_dataset\small_label"
+MASK_DIR = r"E:\code\LY\data\sewage\small_dataset\small_label"
 
 
 def train_fn(loader, model, optimizer, loss_fn, epoch, scaler):
