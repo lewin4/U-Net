@@ -14,29 +14,35 @@ IMAGE_HEIGHT = 768
 train_transform = A.Compose(
         [
             A.Resize(height=IMAGE_HEIGHT, width=IMAGE_WIDTH),
-            A.Rotate(limit=35, p=1.0),
-            A.HorizontalFlip(p=0.5),
-            A.VerticalFlip(p=0.1),
-            A.Normalize(
-                mean=[0.5330, 0.5463, 0.5493],
-                std=[0.1143, 0.1125, 0.1007],
-                max_pixel_value=255.0,
-            ),
-            ToTensorV2(),
+            # A.Rotate(limit=35, p=1.0),
+            # A.HorizontalFlip(p=0.5),
+            # A.VerticalFlip(p=0.1),
+            # A.Normalize(
+            #     mean=[0.5330, 0.5463, 0.5493],
+            #     std=[0.1143, 0.1125, 0.1007],
+            #     max_pixel_value=255.0,
+            # ),
+            # ToTensorV2(),
         ],
     )
 
 dataset = SewageDataset(IMG_DIR, MASK_DIR, train=True, transform=train_transform)
 img, label = dataset[0]
-img = img.unsqueeze(0)
-label = label.unsqueeze(0)
-print(img.dtype)
-print(type(img))
-print(img.shape)
+label *= 120
+img = Image.fromarray(img)
+label = Image.fromarray(label)
+label.show()
+img.show()
 
-print(label.dtype)
-print(type(label))
-print(label.shape)
+# img = img.unsqueeze(0)
+# label = label.unsqueeze(0)
+# print(img.dtype)
+# print(type(img))
+# print(img.shape)
+#
+# print(label.dtype)
+# print(type(label))
+# print(label.shape)
 
 # zero = 0
 # one = 0
@@ -55,17 +61,17 @@ print(label.shape)
 #             frame[i][j]=0
 #             lis.append(img[i][j])
 
-model = UNet(retain_dim=True, out_size=(IMAGE_HEIGHT, IMAGE_WIDTH))
-
-with torch.no_grad():
-    model.eval()
-    pred = torch.sigmoid(model(img))
-    pred = (pred > 0.5).float()
-    print(pred.dtype)
-    print(type(pred))
-    print(pred.shape)
-    print(pred)
-    print(pred.mean())
+# model = UNet(retain_dim=True, out_size=(IMAGE_HEIGHT, IMAGE_WIDTH))
+#
+# with torch.no_grad():
+#     model.eval()
+#     pred = torch.sigmoid(model(img))
+#     pred = (pred > 0.5).float()
+#     print(pred.dtype)
+#     print(type(pred))
+#     print(pred.shape)
+#     print(pred)
+#     print(pred.mean())
 
 
 
