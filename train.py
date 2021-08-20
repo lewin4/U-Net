@@ -105,6 +105,7 @@ def main():
     best_score = 0
     if LOAD_MODEL:
         load_checkpoint(torch.load("output/checkpoints/best_checkpoint.pth", map_location=DEVICE), model)
+        torch.save(model,"output/checkpoints/unet_model.pth")
         best_score = check_accuracy(val_loader, model, device=DEVICE)
 
     scalar = torch.cuda.amp.GradScaler()
