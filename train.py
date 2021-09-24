@@ -33,7 +33,7 @@ def train_fn(loader, model, optimizer, loss_fn, epoch, scaler):
         data = data.to(DEVICE)
         targets = targets.float().unsqueeze(1).to(DEVICE)
 
-        # forward
+        # forward torch.cuda.amp.GradScaler()
         with torch.cuda.amp.autocast():
             predictions = model(data)
             loss = loss_fn(predictions, targets)
