@@ -4,8 +4,10 @@ from tqdm import tqdm
 import torch.nn as nn
 import logging
 import numpy as np
+import time
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+
 
 class SegmentationMetric(object):
     def __init__(self, numClass):
@@ -125,7 +127,7 @@ def check_accuracy(loader, model, device, epoch=0):
     with torch.no_grad():
         loop = tqdm(loader)
         loop.set_description(f"Epoch {epoch} val")
-        iou = np.array([0.,0.])
+        iou = np.array([0., 0.])
         pa = 0
         for x, y in loop:
             x = x.to(device)
@@ -152,6 +154,24 @@ def check_accuracy(loader, model, device, epoch=0):
     logging.info(f"mIOU: {np.mean(iou / len(loader)).item()}")
     model.train()
     return np.mean(iou / len(loader)).item()
+
+
+def check_time(loader, model, device, stop, epoch=0):
+    model.eval()
+
+    with torch.no_grad():
+        loop = tqdm(loader)
+        loop.set_description(f"Epoch {epoch} val")
+        trick = time.time()
+        for i, (x, y) in enumerate(loop):
+            if i >= stop:
+                break
+            x = x.to(device)
+            y = y.to(device).unsqueeze(1)
+            preds = torch.sigmoid(model(x))
+        seconds = time.time() - trick
+    model.train()
+    return seconds / 30, seconds
 
 
 def save_predictions_as_imgs(loader, model, folder="output/saved_images/", device="cuda"):

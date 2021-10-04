@@ -9,7 +9,8 @@ from dataloader import get_loaders
 import logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
-from utils import (load_checkpoint, save_checkpoint, check_accuracy, save_predictions_as_imgs, DiceLoss)
+from utils import (load_checkpoint, save_checkpoint, check_accuracy,
+                   save_predictions_as_imgs, DiceLoss, check_time)
 
 # Hyperparameters etc.
 LEARNING_RATE = 5e-5
@@ -21,8 +22,8 @@ IMAGE_WIDTH = 1024
 IMAGE_HEIGHT = 768
 PIN_MEMORY = True
 LOAD_MODEL = True
-IMG_DIR = r"E:\LY\data\sewage\small_dataset\small_img"
-MASK_DIR = r"E:\LY\data\sewage\small_dataset\small_label"
+IMG_DIR = r"D:\Code\data\sewage\small_dataset\small_img"
+MASK_DIR = r"D:\Code\data\sewage\small_dataset\small_label"
 
 
 def train_fn(loader, model, optimizer, loss_fn, epoch, scaler):
@@ -101,6 +102,9 @@ def main():
         train_transform,
         val_transform,
     )
+    timeave, time = check_time(val_loader, model, DEVICE, 5)
+    print(f"{len(val_loader)}个batch的使用时间:", time)
+    print("平均使用时间：", timeave)
 
     best_score = 0
     if LOAD_MODEL:
